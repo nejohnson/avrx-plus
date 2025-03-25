@@ -35,7 +35,7 @@ VPATH    = $(SRCDIR)
 
 ##############################################################################
 
-CSRC_CORE = 	axpc_queuepid.c		\
+CSRC_CORE = 	axpc_queuepid.c			\
 		axpc_appendobj.c		\
 		axpc_removeobj.c		\
 		axpc_removenextobj.c
@@ -46,7 +46,7 @@ CSRC =  $(CSRC_CORE)				\
 	axp_intsendmessage.c			\
 	axp_intsetsemaphore.c			\
 	axp_kernel.c				\
-	axp_priority.c 			\
+	axp_priority.c 				\
 	axp_recvmessage.c			\
 	axp_resetsemaphore.c			\
 	axp_resume.c				\
@@ -54,10 +54,10 @@ CSRC =  $(CSRC_CORE)				\
 	axp_sendmessage.c			\
 	axp_setsemaphore.c			\
 	axp_suspend.c				\
-	axp_systemobj.c			\
-	axp_taskexit.c 			\
-	axp_taskinit.c 			\
-	axp_terminate.c			\
+	axp_systemobj.c				\
+	axp_taskexit.c 				\
+	axp_initthread.c 			\
+	axp_terminate.c				\
 	axp_testsemaphore.c			\
 	axp_waitmessage.c			\
 	axp_waitsemaphore.c			\
@@ -72,7 +72,8 @@ ASRC  = axp_canceltimer.S 			\
 	axp_semaphores.S 			\
 	axp_starttimermessage.S 		\
 	axp_suspend.S 				\
-	axp_tasking.S 				\
+	axp_enterkernel.S 			\
+	axp_leavekernel.S			\
 	axp_timequeue.S 	
 
 OBJS = $(addprefix $(BUILDDIR)/,$(CSRC:.c=.o) $(ASRC:.S=.o))

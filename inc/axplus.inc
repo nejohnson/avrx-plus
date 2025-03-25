@@ -88,12 +88,12 @@
    NB: CODE depends upon RunQueue being the FIRST item!
 */
 
-#define RunQueue 0	/* Head of the run queue */
-#define Running 2	/* Current running task */
-#define AvrXStack 4	/* User defined stack location */
-#define SysLevel 6	/* re-entry counter into kernel context */
+#define runQueue 0	/* Head of the run queue */
+#define running 2	/* Current running task */
+#define pStack 4	/* User defined stack location */
+#define sysLevel 6	/* re-entry counter into kernel context */
 
-#	define AvrXKernelDataSz 7
+#	define axpKernelDataSz 7
 
 /* ******** TCB (Task Control Block) offsets */
 

@@ -1,6 +1,6 @@
 ##############################################################################
 #
-# Makefile for AvrX-Plus(avrx-plus)
+# Makefile for AvrX-Plus (avrx-plus)
 #
 ##############################################################################
 #
@@ -35,45 +35,45 @@ VPATH    = $(SRCDIR)
 
 ##############################################################################
 
-CSRC_CORE = 	avrxc_queuepid.c		\
-		avrxc_appendobj.c		\
-		avrxc_removeobj.c		\
-		avrxc_removenextobj.c
+CSRC_CORE = 	axpc_queuepid.c		\
+		axpc_appendobj.c		\
+		axpc_removeobj.c		\
+		axpc_removenextobj.c
 
 CSRC =  $(CSRC_CORE)				\
-	avrx_delay.c				\
-	avrx_halt.c				\
-	avrx_intsendmessage.c			\
-	avrx_intsetsemaphore.c			\
-	avrx_kernel.c				\
-	avrx_priority.c 			\
-	avrx_recvmessage.c			\
-	avrx_resetsemaphore.c			\
-	avrx_resume.c				\
-	avrx_runtask.c				\
-	avrx_sendmessage.c			\
-	avrx_setsemaphore.c			\
-	avrx_suspend.c				\
-	avrx_systemobj.c			\
-	avrx_taskexit.c 			\
-	avrx_taskinit.c 			\
-	avrx_terminate.c			\
-	avrx_testsemaphore.c			\
-	avrx_waitmessage.c			\
-	avrx_waitsemaphore.c			\
-	avrx_yield.c
+	axp_delay.c				\
+	axp_halt.c				\
+	axp_intsendmessage.c			\
+	axp_intsetsemaphore.c			\
+	axp_kernel.c				\
+	axp_priority.c 			\
+	axp_recvmessage.c			\
+	axp_resetsemaphore.c			\
+	axp_resume.c				\
+	axp_runtask.c				\
+	axp_sendmessage.c			\
+	axp_setsemaphore.c			\
+	axp_suspend.c				\
+	axp_systemobj.c			\
+	axp_taskexit.c 			\
+	axp_taskinit.c 			\
+	axp_terminate.c			\
+	axp_testsemaphore.c			\
+	axp_waitmessage.c			\
+	axp_waitsemaphore.c			\
+	axp_yield.c
 	
 
-ASRC  = avrx_canceltimer.S 			\
-	avrx_canceltimermessage.S 		\
-	avrx_message.S 				\
-	avrx_recvmessage.S 			\
-	avrx_reschedule.S 			\
-	avrx_semaphores.S 			\
-	avrx_starttimermessage.S 		\
-	avrx_suspend.S 				\
-	avrx_tasking.S 				\
-	avrx_timequeue.S 	
+ASRC  = axp_canceltimer.S 			\
+	axp_canceltimermessage.S 		\
+	axp_message.S 				\
+	axp_recvmessage.S 			\
+	axp_reschedule.S 			\
+	axp_semaphores.S 			\
+	axp_starttimermessage.S 		\
+	axp_suspend.S 				\
+	axp_tasking.S 				\
+	axp_timequeue.S 	
 
 OBJS = $(addprefix $(BUILDDIR)/,$(CSRC:.c=.o) $(ASRC:.S=.o))
 

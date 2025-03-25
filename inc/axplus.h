@@ -1,72 +1,72 @@
-#ifndef AVRXCHEADER
-#define AVRXCHEADER
+#ifndef AXPLUS_H
+#define AXPLUS_H
 
 #include <stdint.h>
 #include <avr/pgmspace.h>
 
 /* Kernel *************************************************************/
 
-extern void * AvrXSetKernelStack(void *);
+extern void * axp_SetKernelStack(void *);
 
 /* Tasks **************************************************************/
 
-typedef struct _avrxPCB
+typedef struct axpPCB
 {
-    struct _avrxPCB   *next;
+    struct axpPCB   *next;
     uint8_t            flags;
-#define AVRX_PID_Idle         (_BV(4))
-#define AVRX_PID_Suspend      (_BV(5))
-#define AVRX_PID_Suspended    (_BV(6))
+#define AXP_PID_Idle         (_BV(4))
+#define AXP_PID_Suspend      (_BV(5))
+#define AXP_PID_Suspended    (_BV(6))
 
     uint8_t            priority;
     void              *pStack;
-} avrxPCB, *avrxPID;
-#define AVRX_NOPID ((avrxPID)0)
+} axpPCB, *axpPID;
+#define AXP_NOPID ((axpPID)0)
 
 /* Return address, 32 registers, Status Register */
-#define _AVRX_MINSTK(35)
+#define _AXP_MINSTK           (35)
 
 /* Decorate task functions with compiler attributes */
-#define _AVRX_TASKFUNC(A)                   \
+#define _AXP_TASKFUNC(A)                   \
    void A(void) __attribute__ ((noreturn)); \
    void A(void)
 
-#define AVRX_STKNAME(A) A ## Stk
-#define AVRX_PIDNAME(A) A ## Pid
+#define AXP_STKNAME(A) A ## Stk
+#define AXP_PIDNAME(A) A ## Pid
 
 /* Define a task */
-#define AVRX_TASKDEF(TASKNAME, STACKSZ)                  \
-   uint8_t AVRX_STKNAME(TASKNAME)[STACKSZ+_AVRX_MINSTK]; \
-   avrxPID AVRX_PIDNAME(TASKNAME);                       \
-   _AVRX_TASKFUNC(TASKNAME)
+#define AXP_TASKDEF(TASKNAME, STACKSZ)                  \
+   uint8_t AXP_STKNAME(TASKNAME)[STACKSZ+_AXP_MINSTK]; \
+   axpPID AXP_PIDNAME(TASKNAME);                       \
+   _AXP_TASKFUNC(TASKNAME)
 
 /* Interrupt handler */
-#define AVRX_SIGINT(vector) \
+#define AXP_SIGINT(vector) \
    ISR(vector, ISR_NAKED)
 
 /* External definition of a task */
-#define AVRX_EXTERNTASK(TASKNAME)  \
-   _AVRX_TASKFUNC(TASKNAME);       \
-   extern AVRX_PIDNAME(TASKNAME);
+#define AXP_EXTERNTASK(TASKNAME)  \
+   _AXP_TASKFUNC(TASKNAME);       \
+   extern AXP_PIDNAME(TASKNAME);
 
-extern avrxPID AvrXTaskInit(uint8_t *, void (*)(void), avrxPID, uint8_t);
-extern void AvrXRunTask(uint8_t *, void (*)(void), avrxPID, uint8_t);
+extern axpPID axp_TaskInit(uint8_t *, void (*)(void), axpPID, uint8_t);
+extern void axp_RunTask(uint8_t *, void (*)(void), axpPID, uint8_t);
 
-extern avrxPID AvrXSelf(void);
-extern uint8_t AvrXGetPriority(avrxPID);
-extern uint8_t AvrXSetPriority(avrxPID, uint8_t);
-extern void AvrXResume(avrxPID);
-extern void AvrXSuspend(avrxPID);
-extern void AvrXYield(void);
-extern void AvrXIntReschedule(void);
+extern axpPID axp_Self(void);
+extern uint8_t axp_GetPriority(axpPID);
+extern uint8_t axp_SetPriority(axpPID, uint8_t);
+extern void axp_Resume(axpPID);
+extern void axp_Suspend(axpPID);
+extern void axp_Yield(void);
+extern void axp_IntReschedule(void);
 
 /*****************************************************************************
  *
  *  FUNCTION
- *      AvrXTerminate
+ *      axp_Terminate
  *
  *  SYNOPSIS
- *      void AvrXTerminate(pProcessID)
+ *      void axp_Terminate(pProcessID)
  *
  *  DESCRIPTION
  *      Force any task to terminate.
@@ -75,15 +75,15 @@ extern void AvrXIntReschedule(void);
  *      none
  *
  *****************************************************************************/
- extern void AvrXTerminate(avrxPID);
+ extern void axp_Terminate(axpPID);
 
 /*****************************************************************************
  *
  *  FUNCTION
- *      AvrXTaskExit
+ *      axp_TaskExit
  *
  *  SYNOPSIS
- *      void AvrXTaskExit(void)
+ *      void axp_TaskExit(void)
  *
  *  DESCRIPTION
  *      Called by a task to terminate itself.  From this point on the task can
@@ -93,15 +93,15 @@ extern void AvrXIntReschedule(void);
  *      none
  *
  *****************************************************************************/
-extern void AvrXTaskExit(void);
+extern void axp_TaskExit(void);
 
 /*****************************************************************************
  *
  *  FUNCTION
- *      AvrXHalt
+ *      axp_Halt
  *
  *  SYNOPSIS
- *      void AvrXHalt(void)
+ *      void axp_Halt(void)
  *
  *  DESCRIPTION
  *      Halt the system, wait for reset
@@ -110,37 +110,37 @@ extern void AvrXTaskExit(void);
  *      Never returns, it's the very last thing you ever do....
  *
  *****************************************************************************/
-extern void AvrXHalt(void);
+extern void axp_Halt(void);
 
 /*****************************************************************************
  *
  *  FUNCTION
- *      AvrXEnterKernel
- *      AvrXLeaveKernel
+ *      axp_EnterKernel
+ *      axp_LeaveKernel
  *
  *  SYNOPSIS
- *      void AvrXEnterKernel(void)
- *      void AvrXLeaveKernel(void)
+ *      void axp_EnterKernel(void)
+ *      void axp_LeaveKernel(void)
  *
  *  DESCRIPTION
  *      Switch to and from kernel context.  Must be first and last actions 
  *      inside interrupt handler.  E.g.,
  *
- *      AVRX_SIGINT(TIMEY_WIMEY_vect)
+ *      AXP_SIGINT(TIMEY_WIMEY_vect)
  *      {
- *          AvrXEnterKernel();
+ *          axp_EnterKernel();
  *              .
  *              .
  *              .
- *          AvrXLeaveKernel();
+ *          axp_LeaveKernel();
  *      }
  *
  *  RETURNS
  *      None
  *
  *****************************************************************************/
-extern void AvrXEnterKernel(void);
-extern void AvrXLeaveKernel(void);
+extern void axp_EnterKernel(void);
+extern void axp_LeaveKernel(void);
 
 /*****************************************************************************/
 /*****************************************************************************/
@@ -159,30 +159,30 @@ extern void AvrXLeaveKernel(void);
  SEM_WAIT         // Something is waiting on the semaphore
                   // Any other value is the address of a processID
 */
-#define AVRX_SEM_PEND ((Mutex)0)
-#define AVRX_SEM_DONE ((Mutex)1)
-#define AVRX_SEM_WAIT ((Mutex)2)
+#define AXP_SEM_PEND ((Mutex)0)
+#define AXP_SEM_DONE ((Mutex)1)
+#define AXP_SEM_WAIT ((Mutex)2)
 
-typedef avrxPID Mutex, *pMutex;     /* A mutex is a pointer to a process */
+typedef axpPID Mutex, *pMutex;     /* A mutex is a pointer to a process */
 
-#define AVRX_MUTEX(A)\
+#define AXP_MUTEX(A)\
         Mutex A
 
-extern void AvrXSetSemaphore(pMutex);
-extern void AvrXIntSetSemaphore(pMutex);
-extern void AvrXWaitSemaphore(pMutex);
+extern void axp_SetSemaphore(pMutex);
+extern void axp_IntSetSemaphore(pMutex);
+extern void axp_WaitSemaphore(pMutex);
 
-extern Mutex AvrXTestSemaphore(pMutex);
-#define AvrXIntTestSemaphore(A) \
-            AvrXTestSemaphore(A)
+extern Mutex axp_TestSemaphore(pMutex);
+#define axp_IntTestSemaphore(A) \
+            axp_TestSemaphore(A)
 
 /*****************************************************************************
  *
  *  FUNCTION
- *      AvrXResetSemaphore
+ *      axp_ResetSemaphore
  *
  *  SYNOPSIS
- *      void AvrXResetSemaphore(pSystemObject)
+ *      void axp_ResetSemaphore(pSystemObject)
  *
  *  DESCRIPTION
  *      Resets the semaphore.
@@ -191,7 +191,7 @@ extern Mutex AvrXTestSemaphore(pMutex);
  *      none
  *
  *****************************************************************************/
-extern void AvrXResetSemaphore(pMutex);
+extern void axp_ResetSemaphore(pMutex);
 
 /*****************************************************************************/
 /*****************************************************************************/
@@ -212,12 +212,12 @@ typedef struct SystemObject
 /*****************************************************************************
  *
  *  FUNCTION
- *      AvrXSetObjectSemaphore
- *      AvrXIntSetObjectSemaphore
+ *      axp_SetObjectSemaphore
+ *      axp_IntSetObjectSemaphore
  *
  *  SYNOPSIS
- *      void AvrXSetObjectSemaphore(pSystemObject)
- *      void AvrXIntSetObjectSemaphore(pSystemObject) 
+ *      void axp_SetObjectSemaphore(pSystemObject)
+ *      void axp_IntSetObjectSemaphore(pSystemObject) 
  *
  *  DESCRIPTION
  *      Sets the semaphore within a System Object.
@@ -227,16 +227,16 @@ typedef struct SystemObject
  *      none
  *
  *****************************************************************************/
-extern void AvrXSetObjectSemaphore(pSystemObject);
-extern void AvrXIntSetObjectSemaphore(pSystemObject);
+extern void axp_SetObjectSemaphore(pSystemObject);
+extern void axp_IntSetObjectSemaphore(pSystemObject);
 
 /*****************************************************************************
  *
  *  FUNCTION
- *      AvrXResetObjectSemaphore
+ *      axp_ResetObjectSemaphore
  *
  *  SYNOPSIS
- *      void AvrXResetObjectSemaphore(pSystemObject)
+ *      void axp_ResetObjectSemaphore(pSystemObject)
  *
  *  DESCRIPTION
  *      Resets the semaphore within a System Object.
@@ -245,15 +245,15 @@ extern void AvrXIntSetObjectSemaphore(pSystemObject);
  *      none
  *
  *****************************************************************************/
-extern void AvrXResetObjectSemaphore(pSystemObject);
+extern void axp_ResetObjectSemaphore(pSystemObject);
 
 /*****************************************************************************
  *
  *  FUNCTION
- *      AvrXTestObjectSemaphore
+ *      axp_TestObjectSemaphore
  *
  *  SYNOPSIS
- *      void AvrXTestObjectSemaphore(pSystemObject)
+ *      void axp_TestObjectSemaphore(pSystemObject)
  *
  *  DESCRIPTION
  *      Gets the state of the semaphore within a System Object.
@@ -266,15 +266,15 @@ extern void AvrXResetObjectSemaphore(pSystemObject);
  *                            // Any other value is the address of a processID
  *
  *****************************************************************************/
-extern Mutex AvrXTestObjectSemaphore(pSystemObject);
+extern Mutex axp_TestObjectSemaphore(pSystemObject);
 
 /*****************************************************************************
  *
  *  FUNCTION
- *      AvrXWaitObjectSemaphore
+ *      axp_WaitObjectSemaphore
  *
  *  SYNOPSIS
- *      void AvrXWaitObjectSemaphore(pSystemObject)
+ *      void axp_WaitObjectSemaphore(pSystemObject)
  *
  *  DESCRIPTION
  *      Waits on the semaphore within a System Object.
@@ -283,7 +283,7 @@ extern Mutex AvrXTestObjectSemaphore(pSystemObject);
  *      none
  *
  *****************************************************************************/
-extern void AvrXWaitObjectSemaphore(pSystemObject);
+extern void axp_WaitObjectSemaphore(pSystemObject);
 
 /*****************************************************************************/
 /*****************************************************************************/
@@ -308,35 +308,35 @@ typedef struct MessageControlBlock
 
 #define NOMESSAGE ((pMessageControlBlock)0)
 
-#define AVRX_MESSAGE(A) \
+#define AXP_MESSAGE(A) \
         MessageControlBlock A
 
 typedef struct MessageQueue
 {
     pMessageControlBlock message;    /* List of messages */
-    avrxPID pid;        /* List of processes */
+    axpPID pid;        /* List of processes */
 }
 * pMessageQueue, MessageQueue;
 
-#define AVRX_MESSAGEQ(A)\
+#define AXP_MESSAGEQ(A)\
         MessageQueue A
 
-extern pMessageControlBlock AvrXRecvMessage(pMessageQueue);
+extern pMessageControlBlock axp_RecvMessage(pMessageQueue);
 
-extern pMessageControlBlock AvrXWaitMessage(pMessageQueue);
+extern pMessageControlBlock axp_WaitMessage(pMessageQueue);
 
-extern void AvrXSendMessage(pMessageQueue, pMessageControlBlock);
+extern void axp_SendMessage(pMessageQueue, pMessageControlBlock);
 
-extern void AvrXIntSendMessage(pMessageQueue, pMessageControlBlock);
+extern void axp_IntSendMessage(pMessageQueue, pMessageControlBlock);
 
-#define AvrXAckMessage(A) \
-        AvrXSetObjectSemaphore((pSystemObject)(A))
+#define axp_AckMessage(A) \
+        axp_SetObjectSemaphore((pSystemObject)(A))
         
-#define AvrXWaitMessageAck(A) \
-        AvrXWaitObjectSemaphore((pSystemObject)(A))
+#define axp_WaitMessageAck(A) \
+        axp_WaitObjectSemaphore((pSystemObject)(A))
 
-#define AvrXTestMessageAck(A) \
-        AvrXTestObjectSemaphore((pSystemObject)(A))
+#define axp_TestMessageAck(A) \
+        axp_TestObjectSemaphore((pSystemObject)(A))
 
 /*****************************************************************************/
 /*****************************************************************************/
@@ -360,15 +360,15 @@ typedef struct TimerControlBlock
 
 #define NOTIMER ((pTimerControlBlock)0)
 
-#define AVRX_TIMER(A) TimerControlBlock A
+#define AXP_TIMER(A) TimerControlBlock A
 
 /*****************************************************************************
  *
  *  FUNCTION
- *      AvrXStartTimer
+ *      axp_StartTimer
  *
  *  SYNOPSIS
- *      void AvrXStartTimer(pTimerControlBlock pTCB, uint16_t count)
+ *      void axp_StartTimer(pTimerControlBlock pTCB, uint16_t count)
  *
  *  DESCRIPTION
  *      Start a timer pTCB to run for count system ticks.
@@ -378,15 +378,15 @@ typedef struct TimerControlBlock
  *
  *****************************************************************************/
 
-extern void AvrXStartTimer(pTimerControlBlock, uint16_t);
+extern void axp_StartTimer(pTimerControlBlock, uint16_t);
 
 /*****************************************************************************
  *
  *  FUNCTION
- *      AvrXCancelTimer
+ *      axp_CancelTimer
  *
  *  SYNOPSIS
- *      pTimerControlBlock AvrXCancelTimer(pTimerControlBlock pTCB)
+ *      pTimerControlBlock axp_CancelTimer(pTimerControlBlock pTCB)
  *
  *  DESCRIPTION
  *      Cancels timer pTCB immediately.  Any waiting task is scehduled to run.
@@ -396,33 +396,33 @@ extern void AvrXStartTimer(pTimerControlBlock, uint16_t);
  *
  *****************************************************************************/
 
-extern pTimerControlBlock AvrXCancelTimer(pTimerControlBlock);
+extern pTimerControlBlock axp_CancelTimer(pTimerControlBlock);
 
 /*****************************************************************************
  *
  *  FUNCTION
- *      AvrXDelay
+ *      axp_Delay
  *
  *  SYNOPSIS
- *      void AvrXDelay(pTimerControlBlock pTCB, uint16_t count)
+ *      void axp_Delay(pTimerControlBlock pTCB, uint16_t count)
  *
  *  DESCRIPTION
- *      Utility function combining AvrXStartTimer() and AvrXWaitTimer().
+ *      Utility function combining axp_StartTimer() and axp_WaitTimer().
  *
  *  RETURNS
  *      none
  *
  *****************************************************************************/
 
-extern void AvrXDelay(pTimerControlBlock, uint16_t);
+extern void axp_Delay(pTimerControlBlock, uint16_t);
 
 /*****************************************************************************
  *
  *  FUNCTION
- *      AvrXWaitTimer
+ *      axp_WaitTimer
  *
  *  SYNOPSIS
- *      void AvrXWaitTimer(pTimerControlBlock pTCB)
+ *      void axp_WaitTimer(pTimerControlBlock pTCB)
  *
  *  DESCRIPTION
  *      Blocking wait for a timer to complete.
@@ -432,16 +432,16 @@ extern void AvrXDelay(pTimerControlBlock, uint16_t);
  *
  *****************************************************************************/
 
-#define AvrXWaitTimer(A) \
-        AvrXWaitObjectSemaphore((pSystemObject)(A))
+#define axp_WaitTimer(A) \
+        axp_WaitObjectSemaphore((pSystemObject)(A))
 
 /*****************************************************************************
  *
  *  FUNCTION
- *      AvrXTestTimer
+ *      axp_TestTimer
  *
  *  SYNOPSIS
- *      void AvrXTestTimer(pTimerControlBlock pTCB)
+ *      void axp_TestTimer(pTimerControlBlock pTCB)
  *
  *  DESCRIPTION
  *      Non-blocking check to see if a timer is running or not.
@@ -454,27 +454,27 @@ extern void AvrXDelay(pTimerControlBlock, uint16_t);
  *
  *****************************************************************************/
         
-#define AvrXTestTimer(A) \
-        AvrXTestObjectSemaphore((pSystemObject)(A))
+#define axp_TestTimer(A) \
+        axp_TestObjectSemaphore((pSystemObject)(A))
 
 /*****************************************************************************
  *
  *  FUNCTION
- *      AvrXTimerHandler
+ *      axp_TimerHandler
  *
  *  SYNOPSIS
- *      void AvrXTimerHandler(void)
+ *      void axp_TimerHandler(void)
  *
  *  DESCRIPTION
  *      Kernel Function to be called by timer ISR.
  *      The simplest timer handler is:
  *
- *	AVRX_SIGINT(TIMER0_OVF_vect)
+ *	AXP_SIGINT(TIMER0_OVF_vect)
  *	{
- *		AvrXEnterKernel();          // Switch to kernel stack/context
+ *		axp_EnterKernel();          // Switch to kernel stack/context
  *		TCNT0 = TCNT0_INIT;
- *		AvrXTimerHandler();         // Call Time queue manager
- *		AvrXLeaveKernel();          // Return to tasks
+ *		axp_TimerHandler();         // Call Time queue manager
+ *		axp_LeaveKernel();          // Return to tasks
  *	}
  *
  *  RETURNS
@@ -482,7 +482,7 @@ extern void AvrXDelay(pTimerControlBlock, uint16_t);
  *
  *****************************************************************************/
 
-extern void AvrXTimerHandler(void);
+extern void axp_TimerHandler(void);
 
 /*****************************************************************************/
 /*****************************************************************************/
@@ -509,9 +509,9 @@ typedef struct TimerMessageBlock
 // Special versions of timer queue elements that get sent
 // to a message queue when expired.
 
-extern void AvrXStartTimerMessage(pTimerMessageBlock, uint16_t, pMessageQueue);
-extern pMessageControlBlock AvrXCancelTimerMessage(pTimerMessageBlock, pMessageQueue);
+extern void axp_StartTimerMessage(pTimerMessageBlock, uint16_t, pMessageQueue);
+extern pMessageControlBlock axp_CancelTimerMessage(pTimerMessageBlock, pMessageQueue);
 
 
 
-#endif /* AVRXCHEADER */
+#endif /* AXPLUS_H */

@@ -1,5 +1,5 @@
-#ifndef __AVRXINC
-#define __AVRXINC
+#ifndef __AXPLUSINC
+#define __AXPLUSINC
 
 #include <avr/io.h> 
 
@@ -24,16 +24,6 @@
 #  define tmp4    R26   /* X */
 #  define tmp5    R27   /* X */
 
-
-/*
-#  define _FUNCTION(A) \
-        .global A $ \
-        .func   A
-#  define _ENDFUNC .endfunc
-#  define _PUBLIC(A) .global A
-#  define _MODULE(A) .section .text.avrx.A
-*/
-
 .macro _MODULE filename
 		.file "\filename"
 		.text
@@ -44,7 +34,7 @@
 .endm
 
 .macro _FUNCTION fname
-		.section .text.avrx.\fname,"ax",@progbits
+		.section .text.axp.\fname,"ax",@progbits
 		.global \fname
 		.type \fname, @function
 .endm
@@ -91,9 +81,9 @@
 #  define _r1h     27
 
 
-/* ******** AVRX kernel data structure offsets
-   These are offsets into a slab of memory called "AvrXKernelData"
-   defined in avrx_tasking.s
+/* ******** AVRX-Plus kernel data structure offsets
+   These are offsets into a slab of memory called "axpKernelData"
+   defined in axp_tasking.s
 
    NB: CODE depends upon RunQueue being the FIRST item!
 */
@@ -217,9 +207,9 @@ SEMAPHORE BIT DEFINITIONS
  version notes in AvrX.asm
 */
 
-.macro AVRX_Prolog
+.macro AXP_Prolog
         BeginCritical
-        rcall   AvrXEnterKernel
+        rcall   axp_EnterKernel
         EndCritical
 .endm
 
@@ -236,4 +226,4 @@ SEMAPHORE BIT DEFINITIONS
 #define		Zl 		R30
 #define		Zh 		R31
 
-#endif  /* __AVRXINC */
+#endif  /* __AXPLUSINC */

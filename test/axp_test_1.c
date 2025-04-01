@@ -7,11 +7,14 @@
  * for equal share of CPU.
  *
  * APIs tested:
- *   axpSetKernelStack()
- *   axpInitThread()
- *   axpResume()
- *   axpLeaveKernel()
- *   axpYield()
+ *   axpSetKernelStack
+ *   axpInitThread
+ *   axpResume
+ *   axpLeaveKernel
+ *   axpYield
+ *   axpSelf
+ *   axpGetPriority
+ *   axpSetPriority
  */
 
 #include "axplus.h"
@@ -27,12 +30,19 @@ axpPCB task2PCB;
 axpPID task2PID;
 uint8_t task2Stack[STK+_axpMINSTK];
 
+axpPCB taskXPCB;
+axpPID taskXPID;
+uint8_t taskXStack[STK+_axpMINSTK];
+
 void task(void *pArg)
 {
    char c = (char)((int)pArg);
    while(1)
    {
       debug_putchar(c);
+      if (c == 'X')
+         axpSetPriority(axpSelf(), 
+	    axpGetPriority(axpSelf())+1);
       axpYield();
    }
 }
@@ -51,6 +61,13 @@ int main(void)
       &task2Stack[sizeof(task2Stack)-1],
       (void*)'2');
    axpResume(task2PID);
+
+   taskXPID = axpInitThread(&taskXPCB,
+      task,
+      &taskXStack[sizeof(taskXStack)-1],
+      (void*)'X');
+   axpSetPriority(taskXPID, 0);
+   axpResume(taskXPID);
 
    axpStartKernel();
    while(1);

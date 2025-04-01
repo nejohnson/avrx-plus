@@ -35,19 +35,24 @@ VPATH    = $(SRCDIR)
 
 ##############################################################################
 
-CSRC_CORE = axp_queuepid.c \
-            axp_removeobj.c \
-            axp_removenextobj.c
+CSRC_CORE = \
+	axp_queuepid.c \
+	axp_removeobj.c \
+	axp_removenextobj.c
 
-CSRC =      $(CSRC_CORE) \
-            axp_kernel.c \
-            axp_resume.c \
-            axp_initthread.c \
-            axp_yield.c
+CSRC = \
+	$(CSRC_CORE) \
+	axp_kernel.c \
+	axp_resume.c \
+	axp_initthread.c \
+	axp_yield.c \
+	axp_priority.c \
+	axp_self.c
 
-ASRC =      axp_enterkernel.S \
-            axp_leavekernel.S \
-            axp_setkernelstack.S
+ASRC = \
+	axp_enterkernel.S \
+	axp_leavekernel.S \
+	axp_setkernelstack.S
 
 OBJS = $(addprefix $(BUILDDIR)/,$(CSRC:.c=.o) $(ASRC:.S=.o))
 

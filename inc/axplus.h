@@ -54,7 +54,7 @@ extern axpPID axpInitThread(axpPID, void (*)(void *), uint8_t *, void *);
 
 extern axpPID  axpSelf(void);
 extern uint8_t axpGetPriority(axpPID);
-extern uint8_t axpSetPriority(axpPID, uint8_t);
+extern void    axpSetPriority(axpPID, uint8_t);
 extern void    axpResume(axpPID);
 extern void    axpSuspend(axpPID);
 extern void    axpYield(void);

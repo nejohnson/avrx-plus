@@ -47,7 +47,10 @@ CSRC = \
 	axp_initthread.c \
 	axp_yield.c \
 	axp_priority.c \
-	axp_self.c
+	axp_self.c \
+	axp_halt.c \
+	axp_threadexit.c \
+	axp_terminate.c
 
 ASRC = \
 	axp_enterkernel.S \

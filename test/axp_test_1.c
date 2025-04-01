@@ -4,7 +4,9 @@
  * Test 1
  *
  * Two tasks that print out '1' and '2' round robin
- * for equal share of CPU.
+ * for equal share of CPU, and a third task whose
+ * priority reduces from highest to just below the
+ * other two at runtime.
  *
  * APIs tested:
  *   axpSetKernelStack

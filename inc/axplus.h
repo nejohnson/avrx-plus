@@ -60,40 +60,8 @@ extern void    axpSuspend(axpPID);
 extern void    axpYield(void);
 extern void    axpIntReschedule(void);
 
-/*****************************************************************************
- *
- *  FUNCTION
- *      axpTerminate
- *
- *  SYNOPSIS
- *      void axpTerminate(pProcessID)
- *
- *  DESCRIPTION
- *      Force any task to terminate.
- *
- *  RETURNS
- *      none
- *
- *****************************************************************************/
- extern void axpTerminate(axpPID);
-
-/*****************************************************************************
- *
- *  FUNCTION
- *      axpTaskExit
- *
- *  SYNOPSIS
- *      void axpTaskExit(void)
- *
- *  DESCRIPTION
- *      Called by a task to terminate itself.  From this point on the task can
- *      no longer be scheduled and remains in a zombie state.
- *
- *  RETURNS
- *      none
- *
- *****************************************************************************/
-extern void axpTaskExit(void);
+extern void    axpTerminate(axpPID);
+extern void    axpThreadExit(void);
 
 /*****************************************************************************
  *

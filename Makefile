@@ -35,46 +35,19 @@ VPATH    = $(SRCDIR)
 
 ##############################################################################
 
-CSRC_CORE = 	axpc_queuepid.c			\
-		axpc_appendobj.c		\
-		axpc_removeobj.c		\
-		axpc_removenextobj.c
+CSRC_CORE = axp_queuepid.c \
+            axp_removeobj.c \
+            axp_removenextobj.c
 
-CSRC =  $(CSRC_CORE)				\
-	axp_delay.c				\
-	axp_halt.c				\
-	axp_intsendmessage.c			\
-	axp_intsetsemaphore.c			\
-	axp_kernel.c				\
-	axp_priority.c 				\
-	axp_recvmessage.c			\
-	axp_resetsemaphore.c			\
-	axp_resume.c				\
-	axp_runtask.c				\
-	axp_sendmessage.c			\
-	axp_setsemaphore.c			\
-	axp_suspend.c				\
-	axp_systemobj.c				\
-	axp_taskexit.c 				\
-	axp_initthread.c 			\
-	axp_terminate.c				\
-	axp_testsemaphore.c			\
-	axp_waitmessage.c			\
-	axp_waitsemaphore.c			\
-	axp_yield.c
-	
+CSRC =      $(CSRC_CORE) \
+            axp_kernel.c \
+            axp_resume.c \
+            axp_initthread.c \
+            axp_yield.c
 
-ASRC  = axp_canceltimer.S 			\
-	axp_canceltimermessage.S 		\
-	axp_message.S 				\
-	axp_recvmessage.S 			\
-	axp_reschedule.S 			\
-	axp_semaphores.S 			\
-	axp_starttimermessage.S 		\
-	axp_suspend.S 				\
-	axp_enterkernel.S 			\
-	axp_leavekernel.S			\
-	axp_timequeue.S 	
+ASRC =      axp_enterkernel.S \
+            axp_leavekernel.S \
+            axp_setkernelstack.S
 
 OBJS = $(addprefix $(BUILDDIR)/,$(CSRC:.c=.o) $(ASRC:.S=.o))
 
@@ -84,13 +57,14 @@ OPT = s
 
 CFLAGS  = -mmcu=$(MCU)
 CFLAGS += -I./$(INCDIR)
-CFLAGS += -O$(OPT)
+CFLAGS += -O$(OPT) -g
 CFLAGS += -funsigned-bitfields -fpack-struct -fshort-enums
+CFLAGS += -fomit-frame-pointer
 CFLAGS += -ffunction-sections -fdata-sections
 CFLAGS += -Wall -Wstrict-prototypes
 CFLAGS += -std=gnu99
 
-AFLAGS = -mmcu=$(MCU) -I./$(INCDIR) -x assembler-with-cpp
+AFLAGS = -mmcu=$(MCU) -I./$(INCDIR) -x assembler-with-cpp -g
 
 ##############################################################################
 

@@ -1,10 +1,10 @@
 /* Copyright (C) 2025 Neil Johnson */
 #include "axplus.inc"
 
-	_MODULE   axp_exterkernel
-	_FUNCTION axp_EnterKernel
+	_MODULE   axpexterkernel
+	_FUNCTION axpEnterKernel
 
-axp_EnterKernel:
+axpEnterKernel:
 	push	R29
 	push	R28
 	push	R27
@@ -106,4 +106,4 @@ AlreadyInKernel:                ; (85/102)
         mov     Zh, tmp2
 	ijmp			; Return to caller (89/106)
 
-        _ENDFUNC axp_EnterKernel
+        _ENDFUNC axpEnterKernel

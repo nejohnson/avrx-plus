@@ -1,10 +1,10 @@
 /* Copyright (C) 2025 Neil Johnson */
 #include "axplus.inc"
 
-        _MODULE   axp_leavekernel
-        _FUNCTION axp_LeaveKernel
+        _MODULE   axpleavekernel
+        _FUNCTION axpLeaveKernel
 
-axp_LeaveKernel:
+axpLeaveKernel:
         pop     R30
         pop     R30
 
@@ -76,5 +76,5 @@ _IdleTask:
         sleep                   ; Power Down..
         rjmp    _IdleTask
 
-        _ENDFUNC axp_LeaveKernel
+        _ENDFUNC axpLeaveKernel
 

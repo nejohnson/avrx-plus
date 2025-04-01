@@ -6,7 +6,7 @@
 
 /* Kernel *************************************************************/
 
-extern void * axp_SetKernelStack(void *);
+extern void * axpSetKernelStack(void *);
 
 /* Tasks **************************************************************/
 
@@ -14,59 +14,59 @@ typedef struct axpPCB
 {
     struct axpPCB   *next;
     uint8_t            flags;
-#define AXP_PID_Idle         (_BV(4))
-#define AXP_PID_Suspend      (_BV(5))
-#define AXP_PID_Suspended    (_BV(6))
+#define axpPID_Idle         (1 << 4)
+#define axpPID_Suspend      (1 << 5)
+#define axpPID_Suspended    (1 << 6)
 
     uint8_t            priority;
     void              *pStack;
 } axpPCB, *axpPID;
-#define AXP_NOPID ((axpPID)0)
+#define axpNOPID ((axpPID)0)
+#define axpDEFAULT_PRIORITY (100)
 
 /* Return address, 32 registers, Status Register */
-#define _AXP_MINSTK           (35)
+#define _axpMINSTK           (35)
 
 /* Decorate task functions with compiler attributes */
-#define _AXP_TASKFUNC(A)                   \
+#define _axpTASKFUNC(A)                   \
    void A(void) __attribute__ ((noreturn)); \
    void A(void)
 
-#define AXP_STKNAME(A) A ## Stk
-#define AXP_PIDNAME(A) A ## Pid
+#define axpSTKNAME(A) A ## Stk
+#define axpPIDNAME(A) A ## Pid
 
 /* Define a task */
-#define AXP_TASKDEF(TASKNAME, STACKSZ)                  \
-   uint8_t AXP_STKNAME(TASKNAME)[STACKSZ+_AXP_MINSTK]; \
-   axpPID AXP_PIDNAME(TASKNAME);                       \
-   _AXP_TASKFUNC(TASKNAME)
+#define axpTASKDEF(TASKNAME, STACKSZ)                  \
+   uint8_t axpSTKNAME(TASKNAME)[STACKSZ+_axpMINSTK]; \
+   axpPID axpPIDNAME(TASKNAME);                       \
+   _axpTASKFUNC(TASKNAME)
 
 /* Interrupt handler */
-#define AXP_SIGINT(vector) \
+#define axpSIGINT(vector) \
    ISR(vector, ISR_NAKED)
 
 /* External definition of a task */
-#define AXP_EXTERNTASK(TASKNAME)  \
-   _AXP_TASKFUNC(TASKNAME);       \
-   extern AXP_PIDNAME(TASKNAME);
+#define axpEXTERNTASK(TASKNAME)  \
+   _axpTASKFUNC(TASKNAME);       \
+   extern axpPIDNAME(TASKNAME);
 
-extern axpPID axp_TaskInit(uint8_t *, void (*)(void), axpPID, uint8_t);
-extern void axp_RunTask(uint8_t *, void (*)(void), axpPID, uint8_t);
+extern axpPID axpInitThread(axpPID, void (*)(void *), uint8_t *, void *);
 
-extern axpPID axp_Self(void);
-extern uint8_t axp_GetPriority(axpPID);
-extern uint8_t axp_SetPriority(axpPID, uint8_t);
-extern void axp_Resume(axpPID);
-extern void axp_Suspend(axpPID);
-extern void axp_Yield(void);
-extern void axp_IntReschedule(void);
+extern axpPID  axpSelf(void);
+extern uint8_t axpGetPriority(axpPID);
+extern uint8_t axpSetPriority(axpPID, uint8_t);
+extern void    axpResume(axpPID);
+extern void    axpSuspend(axpPID);
+extern void    axpYield(void);
+extern void    axpIntReschedule(void);
 
 /*****************************************************************************
  *
  *  FUNCTION
- *      axp_Terminate
+ *      axpTerminate
  *
  *  SYNOPSIS
- *      void axp_Terminate(pProcessID)
+ *      void axpTerminate(pProcessID)
  *
  *  DESCRIPTION
  *      Force any task to terminate.
@@ -75,15 +75,15 @@ extern void axp_IntReschedule(void);
  *      none
  *
  *****************************************************************************/
- extern void axp_Terminate(axpPID);
+ extern void axpTerminate(axpPID);
 
 /*****************************************************************************
  *
  *  FUNCTION
- *      axp_TaskExit
+ *      axpTaskExit
  *
  *  SYNOPSIS
- *      void axp_TaskExit(void)
+ *      void axpTaskExit(void)
  *
  *  DESCRIPTION
  *      Called by a task to terminate itself.  From this point on the task can
@@ -93,15 +93,15 @@ extern void axp_IntReschedule(void);
  *      none
  *
  *****************************************************************************/
-extern void axp_TaskExit(void);
+extern void axpTaskExit(void);
 
 /*****************************************************************************
  *
  *  FUNCTION
- *      axp_Halt
+ *      axpHalt
  *
  *  SYNOPSIS
- *      void axp_Halt(void)
+ *      void axpHalt(void)
  *
  *  DESCRIPTION
  *      Halt the system, wait for reset
@@ -110,37 +110,38 @@ extern void axp_TaskExit(void);
  *      Never returns, it's the very last thing you ever do....
  *
  *****************************************************************************/
-extern void axp_Halt(void);
+extern void axpHalt(void);
 
 /*****************************************************************************
  *
  *  FUNCTION
- *      axp_EnterKernel
- *      axp_LeaveKernel
+ *      axpEnterKernel
+ *      axpLeaveKernel
  *
  *  SYNOPSIS
- *      void axp_EnterKernel(void)
- *      void axp_LeaveKernel(void)
+ *      void axpEnterKernel(void)
+ *      void axpLeaveKernel(void)
  *
  *  DESCRIPTION
  *      Switch to and from kernel context.  Must be first and last actions 
  *      inside interrupt handler.  E.g.,
  *
- *      AXP_SIGINT(TIMEY_WIMEY_vect)
+ *      axpSIGINT(TIMEY_WIMEY_vect)
  *      {
- *          axp_EnterKernel();
+ *          axpEnterKernel();
  *              .
  *              .
  *              .
- *          axp_LeaveKernel();
+ *          axpLeaveKernel();
  *      }
  *
  *  RETURNS
  *      None
  *
  *****************************************************************************/
-extern void axp_EnterKernel(void);
-extern void axp_LeaveKernel(void);
+extern void axpEnterKernel(void);
+extern void axpLeaveKernel(void);
+#define     axpStartKernel()   axpLeaveKernel()
 
 /*****************************************************************************/
 /*****************************************************************************/
@@ -159,30 +160,30 @@ extern void axp_LeaveKernel(void);
  SEM_WAIT         // Something is waiting on the semaphore
                   // Any other value is the address of a processID
 */
-#define AXP_SEM_PEND ((Mutex)0)
-#define AXP_SEM_DONE ((Mutex)1)
-#define AXP_SEM_WAIT ((Mutex)2)
+#define axpSEM_PEND ((Mutex)0)
+#define axpSEM_DONE ((Mutex)1)
+#define axpSEM_WAIT ((Mutex)2)
 
 typedef axpPID Mutex, *pMutex;     /* A mutex is a pointer to a process */
 
-#define AXP_MUTEX(A)\
+#define axpMUTEX(A)\
         Mutex A
 
-extern void axp_SetSemaphore(pMutex);
-extern void axp_IntSetSemaphore(pMutex);
-extern void axp_WaitSemaphore(pMutex);
+extern void axpSetSemaphore(pMutex);
+extern void axpIntSetSemaphore(pMutex);
+extern void axpWaitSemaphore(pMutex);
 
-extern Mutex axp_TestSemaphore(pMutex);
-#define axp_IntTestSemaphore(A) \
-            axp_TestSemaphore(A)
+extern Mutex axpTestSemaphore(pMutex);
+#define axpIntTestSemaphore(A) \
+            axpTestSemaphore(A)
 
 /*****************************************************************************
  *
  *  FUNCTION
- *      axp_ResetSemaphore
+ *      axpResetSemaphore
  *
  *  SYNOPSIS
- *      void axp_ResetSemaphore(pSystemObject)
+ *      void axpResetSemaphore(pSystemObject)
  *
  *  DESCRIPTION
  *      Resets the semaphore.
@@ -191,7 +192,7 @@ extern Mutex axp_TestSemaphore(pMutex);
  *      none
  *
  *****************************************************************************/
-extern void axp_ResetSemaphore(pMutex);
+extern void axpResetSemaphore(pMutex);
 
 /*****************************************************************************/
 /*****************************************************************************/
@@ -212,12 +213,12 @@ typedef struct SystemObject
 /*****************************************************************************
  *
  *  FUNCTION
- *      axp_SetObjectSemaphore
- *      axp_IntSetObjectSemaphore
+ *      axpSetObjectSemaphore
+ *      axpIntSetObjectSemaphore
  *
  *  SYNOPSIS
- *      void axp_SetObjectSemaphore(pSystemObject)
- *      void axp_IntSetObjectSemaphore(pSystemObject) 
+ *      void axpSetObjectSemaphore(pSystemObject)
+ *      void axpIntSetObjectSemaphore(pSystemObject) 
  *
  *  DESCRIPTION
  *      Sets the semaphore within a System Object.
@@ -227,16 +228,16 @@ typedef struct SystemObject
  *      none
  *
  *****************************************************************************/
-extern void axp_SetObjectSemaphore(pSystemObject);
-extern void axp_IntSetObjectSemaphore(pSystemObject);
+extern void axpSetObjectSemaphore(pSystemObject);
+extern void axpIntSetObjectSemaphore(pSystemObject);
 
 /*****************************************************************************
  *
  *  FUNCTION
- *      axp_ResetObjectSemaphore
+ *      axpResetObjectSemaphore
  *
  *  SYNOPSIS
- *      void axp_ResetObjectSemaphore(pSystemObject)
+ *      void axpResetObjectSemaphore(pSystemObject)
  *
  *  DESCRIPTION
  *      Resets the semaphore within a System Object.
@@ -245,15 +246,15 @@ extern void axp_IntSetObjectSemaphore(pSystemObject);
  *      none
  *
  *****************************************************************************/
-extern void axp_ResetObjectSemaphore(pSystemObject);
+extern void axpResetObjectSemaphore(pSystemObject);
 
 /*****************************************************************************
  *
  *  FUNCTION
- *      axp_TestObjectSemaphore
+ *      axpTestObjectSemaphore
  *
  *  SYNOPSIS
- *      void axp_TestObjectSemaphore(pSystemObject)
+ *      void axpTestObjectSemaphore(pSystemObject)
  *
  *  DESCRIPTION
  *      Gets the state of the semaphore within a System Object.
@@ -266,15 +267,15 @@ extern void axp_ResetObjectSemaphore(pSystemObject);
  *                            // Any other value is the address of a processID
  *
  *****************************************************************************/
-extern Mutex axp_TestObjectSemaphore(pSystemObject);
+extern Mutex axpTestObjectSemaphore(pSystemObject);
 
 /*****************************************************************************
  *
  *  FUNCTION
- *      axp_WaitObjectSemaphore
+ *      axpWaitObjectSemaphore
  *
  *  SYNOPSIS
- *      void axp_WaitObjectSemaphore(pSystemObject)
+ *      void axpWaitObjectSemaphore(pSystemObject)
  *
  *  DESCRIPTION
  *      Waits on the semaphore within a System Object.
@@ -283,7 +284,7 @@ extern Mutex axp_TestObjectSemaphore(pSystemObject);
  *      none
  *
  *****************************************************************************/
-extern void axp_WaitObjectSemaphore(pSystemObject);
+extern void axpWaitObjectSemaphore(pSystemObject);
 
 /*****************************************************************************/
 /*****************************************************************************/
@@ -308,7 +309,7 @@ typedef struct MessageControlBlock
 
 #define NOMESSAGE ((pMessageControlBlock)0)
 
-#define AXP_MESSAGE(A) \
+#define axpMESSAGE(A) \
         MessageControlBlock A
 
 typedef struct MessageQueue
@@ -318,25 +319,25 @@ typedef struct MessageQueue
 }
 * pMessageQueue, MessageQueue;
 
-#define AXP_MESSAGEQ(A)\
+#define axpMESSAGEQ(A)\
         MessageQueue A
 
-extern pMessageControlBlock axp_RecvMessage(pMessageQueue);
+extern pMessageControlBlock axpRecvMessage(pMessageQueue);
 
-extern pMessageControlBlock axp_WaitMessage(pMessageQueue);
+extern pMessageControlBlock axpWaitMessage(pMessageQueue);
 
-extern void axp_SendMessage(pMessageQueue, pMessageControlBlock);
+extern void axpSendMessage(pMessageQueue, pMessageControlBlock);
 
-extern void axp_IntSendMessage(pMessageQueue, pMessageControlBlock);
+extern void axpIntSendMessage(pMessageQueue, pMessageControlBlock);
 
-#define axp_AckMessage(A) \
-        axp_SetObjectSemaphore((pSystemObject)(A))
+#define axpAckMessage(A) \
+        axpSetObjectSemaphore((pSystemObject)(A))
         
-#define axp_WaitMessageAck(A) \
-        axp_WaitObjectSemaphore((pSystemObject)(A))
+#define axpWaitMessageAck(A) \
+        axpWaitObjectSemaphore((pSystemObject)(A))
 
-#define axp_TestMessageAck(A) \
-        axp_TestObjectSemaphore((pSystemObject)(A))
+#define axpTestMessageAck(A) \
+        axpTestObjectSemaphore((pSystemObject)(A))
 
 /*****************************************************************************/
 /*****************************************************************************/
@@ -360,15 +361,15 @@ typedef struct TimerControlBlock
 
 #define NOTIMER ((pTimerControlBlock)0)
 
-#define AXP_TIMER(A) TimerControlBlock A
+#define axpTIMER(A) TimerControlBlock A
 
 /*****************************************************************************
  *
  *  FUNCTION
- *      axp_StartTimer
+ *      axpStartTimer
  *
  *  SYNOPSIS
- *      void axp_StartTimer(pTimerControlBlock pTCB, uint16_t count)
+ *      void axpStartTimer(pTimerControlBlock pTCB, uint16_t count)
  *
  *  DESCRIPTION
  *      Start a timer pTCB to run for count system ticks.
@@ -378,15 +379,15 @@ typedef struct TimerControlBlock
  *
  *****************************************************************************/
 
-extern void axp_StartTimer(pTimerControlBlock, uint16_t);
+extern void axpStartTimer(pTimerControlBlock, uint16_t);
 
 /*****************************************************************************
  *
  *  FUNCTION
- *      axp_CancelTimer
+ *      axpCancelTimer
  *
  *  SYNOPSIS
- *      pTimerControlBlock axp_CancelTimer(pTimerControlBlock pTCB)
+ *      pTimerControlBlock axpCancelTimer(pTimerControlBlock pTCB)
  *
  *  DESCRIPTION
  *      Cancels timer pTCB immediately.  Any waiting task is scehduled to run.
@@ -396,33 +397,33 @@ extern void axp_StartTimer(pTimerControlBlock, uint16_t);
  *
  *****************************************************************************/
 
-extern pTimerControlBlock axp_CancelTimer(pTimerControlBlock);
+extern pTimerControlBlock axpCancelTimer(pTimerControlBlock);
 
 /*****************************************************************************
  *
  *  FUNCTION
- *      axp_Delay
+ *      axpDelay
  *
  *  SYNOPSIS
- *      void axp_Delay(pTimerControlBlock pTCB, uint16_t count)
+ *      void axpDelay(pTimerControlBlock pTCB, uint16_t count)
  *
  *  DESCRIPTION
- *      Utility function combining axp_StartTimer() and axp_WaitTimer().
+ *      Utility function combining axpStartTimer() and axpWaitTimer().
  *
  *  RETURNS
  *      none
  *
  *****************************************************************************/
 
-extern void axp_Delay(pTimerControlBlock, uint16_t);
+extern void axpDelay(pTimerControlBlock, uint16_t);
 
 /*****************************************************************************
  *
  *  FUNCTION
- *      axp_WaitTimer
+ *      axpWaitTimer
  *
  *  SYNOPSIS
- *      void axp_WaitTimer(pTimerControlBlock pTCB)
+ *      void axpWaitTimer(pTimerControlBlock pTCB)
  *
  *  DESCRIPTION
  *      Blocking wait for a timer to complete.
@@ -432,16 +433,16 @@ extern void axp_Delay(pTimerControlBlock, uint16_t);
  *
  *****************************************************************************/
 
-#define axp_WaitTimer(A) \
-        axp_WaitObjectSemaphore((pSystemObject)(A))
+#define axpWaitTimer(A) \
+        axpWaitObjectSemaphore((pSystemObject)(A))
 
 /*****************************************************************************
  *
  *  FUNCTION
- *      axp_TestTimer
+ *      axpTestTimer
  *
  *  SYNOPSIS
- *      void axp_TestTimer(pTimerControlBlock pTCB)
+ *      void axpTestTimer(pTimerControlBlock pTCB)
  *
  *  DESCRIPTION
  *      Non-blocking check to see if a timer is running or not.
@@ -454,27 +455,27 @@ extern void axp_Delay(pTimerControlBlock, uint16_t);
  *
  *****************************************************************************/
         
-#define axp_TestTimer(A) \
-        axp_TestObjectSemaphore((pSystemObject)(A))
+#define axpTestTimer(A) \
+        axpTestObjectSemaphore((pSystemObject)(A))
 
 /*****************************************************************************
  *
  *  FUNCTION
- *      axp_TimerHandler
+ *      axpTimerHandler
  *
  *  SYNOPSIS
- *      void axp_TimerHandler(void)
+ *      void axpTimerHandler(void)
  *
  *  DESCRIPTION
  *      Kernel Function to be called by timer ISR.
  *      The simplest timer handler is:
  *
- *	AXP_SIGINT(TIMER0_OVF_vect)
+ *	axpSIGINT(TIMER0_OVF_vect)
  *	{
- *		axp_EnterKernel();          // Switch to kernel stack/context
+ *		axpEnterKernel();          // Switch to kernel stack/context
  *		TCNT0 = TCNT0_INIT;
- *		axp_TimerHandler();         // Call Time queue manager
- *		axp_LeaveKernel();          // Return to tasks
+ *		axpTimerHandler();         // Call Time queue manager
+ *		axpLeaveKernel();          // Return to tasks
  *	}
  *
  *  RETURNS
@@ -482,7 +483,7 @@ extern void axp_Delay(pTimerControlBlock, uint16_t);
  *
  *****************************************************************************/
 
-extern void axp_TimerHandler(void);
+extern void axpTimerHandler(void);
 
 /*****************************************************************************/
 /*****************************************************************************/
@@ -509,8 +510,8 @@ typedef struct TimerMessageBlock
 // Special versions of timer queue elements that get sent
 // to a message queue when expired.
 
-extern void axp_StartTimerMessage(pTimerMessageBlock, uint16_t, pMessageQueue);
-extern pMessageControlBlock axp_CancelTimerMessage(pTimerMessageBlock, pMessageQueue);
+extern void axpStartTimerMessage(pTimerMessageBlock, uint16_t, pMessageQueue);
+extern pMessageControlBlock axpCancelTimerMessage(pTimerMessageBlock, pMessageQueue);
 
 
 

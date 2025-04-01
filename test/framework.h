@@ -21,7 +21,7 @@ void debug_putchar(char c) {
 /* Send a string out the debug port. */
 void debug_puts(const char *str) {
    while(*str)
-      debug_putchar(*str);
+      debug_putchar(*str++);
 }
 
 

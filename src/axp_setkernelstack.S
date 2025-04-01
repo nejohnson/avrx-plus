@@ -1,10 +1,10 @@
 /* Copyright (c) 2025 Neil Johnson */
 #include "axplus.inc"
-        _MODULE axp_setkernelstack
-        _FUNCTION axp_SetKernelStack
+        _MODULE axpsetkernelstack
+        _FUNCTION axpSetKernelStack
 
-/* void * axp_SetKernelStack(void *pStack) */
-axp_SetKernelStack:
+/* void * axpSetKernelStack(void *pStack) */
+axpSetKernelStack:
         pop     R31
         pop     R30
         subi    R24, 0
@@ -17,4 +17,4 @@ sks1:
         sts     _axpKernelData+pStack+NextH, R25
         ijmp
 
-        _ENDFUNC axp_SetKernelStack
+        _ENDFUNC axpSetKernelStack

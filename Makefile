@@ -50,7 +50,8 @@ CSRC = \
 	axp_self.c \
 	axp_halt.c \
 	axp_threadexit.c \
-	axp_terminate.c
+	axp_terminate.c \
+	axp_suspend.c
 
 ASRC = \
 	axp_enterkernel.S \

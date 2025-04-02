@@ -58,26 +58,8 @@ extern void    axpSetPriority(axpPID, uint8_t);
 extern void    axpResume(axpPID);
 extern void    axpSuspend(axpPID);
 extern void    axpYield(void);
-extern void    axpIntReschedule(void);
-
 extern void    axpTerminate(axpPID);
 extern void    axpThreadExit(void);
-
-/*****************************************************************************
- *
- *  FUNCTION
- *      axpHalt
- *
- *  SYNOPSIS
- *      void axpHalt(void)
- *
- *  DESCRIPTION
- *      Halt the system, wait for reset
- *
- *  RETURNS
- *      Never returns, it's the very last thing you ever do....
- *
- *****************************************************************************/
 extern void axpHalt(void);
 
 /*****************************************************************************

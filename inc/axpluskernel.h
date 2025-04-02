@@ -33,7 +33,7 @@ extern uint8_t                   _axpTimerQLevel;
 
 extern int8_t   _axpQueuePid(axpPID);
 extern void     _axpAppendObject(axpPID, axpPID);
-extern axpPID   _axpRemoveObject(axpPID, axpPID);
+extern int8_t   _axpRemoveObject(axpPID, axpPID);
 extern axpPID   _axpRemoveNextObject(axpPID);
 extern void     _axpEpilog(void);
 

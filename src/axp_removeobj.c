@@ -1,16 +1,16 @@
 /* Copyright (C) 2025 Neil Johnson */
 #include "axpluskernel.h"
 
-int8_t _axpRemoveObject(axpPID pQueue, axpPID pObject)
+axpPID _axpRemoveObject(axpPID pQueue, axpPID pObject)
 {
    while (pQueue->next)
    {
       if (pQueue->next == pObject)
       {
          _axpRemoveNextObject(pQueue);
-         return -1;
+         return pObject;
       }
       pQueue = pQueue->next;
    }
-   return 0;
+   return axpNOPID;
 }

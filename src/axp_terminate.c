@@ -4,7 +4,7 @@
 void _implTerminate(axpPID pid)
 {
    pid->flags = axpPID_Idle;
-   axpPID pQ = (axpPID)&_axpKernelData;
+   axpPID pQ = (axpPID)&_axpKernelData.runQueue;
    _axpBeginCritical();
    _axpRemoveObject(pQ, pid);   
 }

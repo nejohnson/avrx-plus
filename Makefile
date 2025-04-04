@@ -38,7 +38,8 @@ VPATH    = $(SRCDIR)
 CSRC_CORE = \
 	axp_queuepid.c \
 	axp_removeobj.c \
-	axp_removenextobj.c
+	axp_removenextobj.c \
+	axp_appendobj.c
 
 CSRC = \
 	$(CSRC_CORE) \
@@ -51,7 +52,11 @@ CSRC = \
 	axp_halt.c \
 	axp_threadexit.c \
 	axp_terminate.c \
-	axp_suspend.c
+	axp_suspend.c \
+	axp_setsem.c \
+	axp_waitsem.c \
+	axp_resetsem.c \
+	axp_testsem.c
 
 ASRC = \
 	axp_enterkernel.S \

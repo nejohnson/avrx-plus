@@ -15,7 +15,7 @@ SIMULAVR = $(SIMPATH)/simulavr
 SIMULAVROPTS = -d atmega8 -W 0x20,- -R 0x22,- -T exit -F 8000000
 TRACEOPTS = -t trace.txt
 
-TESTS = axp_test_1 axp_test_2 axp_test_3
+TESTS = axp_test_1 axp_test_2 axp_test_3 axp_test_4
 
 TESTEXE = $(addsuffix .elf, $(TESTS))
 
@@ -42,7 +42,10 @@ run3: axp_test_3.elf
 	@echo "Running simulation..."
 	$(SIMULAVR) $(SIMULAVROPTS) -f $<
 
-	
+run4: axp_test_4.elf
+	@echo "Running simulation..."
+	$(SIMULAVR) $(SIMULAVROPTS) -f $<
+
 ##############################################################################
 ## Cleaning up the mess
 ##############################################################################

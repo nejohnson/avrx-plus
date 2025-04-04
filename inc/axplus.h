@@ -60,7 +60,7 @@ extern void    axpSuspend(axpPID);
 extern void    axpYield(void);
 extern void    axpTerminate(axpPID);
 extern void    axpThreadExit(void);
-extern void axpHalt(void);
+extern void    axpHalt(void);
 
 /*****************************************************************************
  *
@@ -102,47 +102,27 @@ extern void axpLeaveKernel(void);
 /*****************************************************************************/
 
 /*
- Mutex semaphores are a simple linked list of waiting
- processes.  The mutex may have the following values:
+ Semaphores are a simple linked list of waiting
+ threads (PIDs).  The semaphore may have the following values:
 
- SEM_PEND         // Semaphore is reset waiting for a signal
- SEM_DONE         // Semaphore has been triggered.
- SEM_WAIT         // Something is waiting on the semaphore
-                  // Any other value is the address of a processID
+ axpSEM_PEND      // Semaphore is reset waiting for a signal
+ axpSEM_DONE      // Semaphore has been triggered.
+ axpSEM_WAIT      // Something is waiting on the semaphore
+                  // Any other value is the address of a PID
 */
-#define axpSEM_PEND ((Mutex)0)
-#define axpSEM_DONE ((Mutex)1)
-#define axpSEM_WAIT ((Mutex)2)
+#define axpSEM_PEND ((axpSEM)0)
+#define axpSEM_DONE ((axpSEM)1)
+#define axpSEM_WAIT ((axpSEM)2)
 
-typedef axpPID Mutex, *pMutex;     /* A mutex is a pointer to a process */
+typedef axpPID axpSEM;     /* A semaphore is a pointer to a PID */
 
-#define axpMUTEX(A)\
-        Mutex A
-
-extern void axpSetSemaphore(pMutex);
-extern void axpIntSetSemaphore(pMutex);
-extern void axpWaitSemaphore(pMutex);
-
-extern Mutex axpTestSemaphore(pMutex);
-#define axpIntTestSemaphore(A) \
-            axpTestSemaphore(A)
-
-/*****************************************************************************
- *
- *  FUNCTION
- *      axpResetSemaphore
- *
- *  SYNOPSIS
- *      void axpResetSemaphore(pSystemObject)
- *
- *  DESCRIPTION
- *      Resets the semaphore.
- *
- *  RETURNS
- *      none
- *
- *****************************************************************************/
-extern void axpResetSemaphore(pMutex);
+extern void axpSetSem(axpSEM *);
+extern void axpIntSetSem(axpSEM *);
+extern void axpWaitSem(axpSEM *);
+extern axpSEM axpTestSem(axpSEM *);
+#define axpIntTestSem(A) \
+            axpTestSem(A)
+extern void axpResetSem(axpSEM *);
 
 /*****************************************************************************/
 /*****************************************************************************/
@@ -155,7 +135,7 @@ extern void axpResetSemaphore(pMutex);
 typedef struct SystemObject
 {
     struct SystemObject *next;
-    Mutex semaphore;    
+    axpSEM semaphore;    
 }
 * pSystemObject, SystemObject;
 
@@ -217,7 +197,7 @@ extern void axpResetObjectSemaphore(pSystemObject);
  *                            // Any other value is the address of a processID
  *
  *****************************************************************************/
-extern Mutex axpTestObjectSemaphore(pSystemObject);
+extern axpSEM axpTestObjectSemaphore(pSystemObject);
 
 /*****************************************************************************
  *

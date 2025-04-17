@@ -4,6 +4,15 @@
 void axpSetPriority(axpPID pid, uint8_t priority)
 {
    pid->priority = priority;
+   if(pid == axpSelf())
+   {
+      axpYield();
+   }
+   else
+   {
+      axpSuspend(pid);
+      axpResume(pid);
+   }
 }
 
 uint8_t axpGetPriority(axpPID pid)

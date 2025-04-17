@@ -24,17 +24,9 @@
 
 #define STK 10
 
-axpPCB task1PCB;
-axpPID task1PID;
-uint8_t task1Stack[STK+_axpMINSTK];
-
-axpPCB task2PCB;
-axpPID task2PID;
-uint8_t task2Stack[STK+_axpMINSTK];
-
-axpPCB taskXPCB;
-axpPID taskXPID;
-uint8_t taskXStack[STK+_axpMINSTK];
+axpTHREADDEF(task1, STK)
+axpTHREADDEF(task2, STK)
+axpTHREADDEF(taskX, STK)
 
 void task(void *pArg)
 {
@@ -52,24 +44,11 @@ void task(void *pArg)
 int main(void)
 {
    axpSetKernelStack(0);
-   task1PID = axpInitThread(&task1PCB,
-      task,
-      &task1Stack[sizeof(task1Stack)-1],
-      (void*)'1');
-   axpResume(task1PID);
-
-   task2PID = axpInitThread(&task2PCB,
-      task,
-      &task2Stack[sizeof(task2Stack)-1],
-      (void*)'2');
-   axpResume(task2PID);
-
-   taskXPID = axpInitThread(&taskXPCB,
-      task,
-      &taskXStack[sizeof(taskXStack)-1],
-      (void*)'X');
-   axpSetPriority(taskXPID, 0);
-   axpResume(taskXPID);
+   
+   axpStartThread(axpINITTHREAD(task1, task, (void*)'1'));
+   axpStartThread(axpINITTHREAD(task2, task, (void*)'2'));
+   axpStartThread(axpINITTHREAD(taskX, task, (void*)'X'));
+   axpSetPriority(axpPIDNAME(taskX), 0);
 
    axpStartKernel();
    while(1);

@@ -27,19 +27,23 @@ typedef struct axpPCB
 /* Return address, 32 registers, Status Register */
 #define _axpMINSTK           (35)
 
-/* Decorate task functions with compiler attributes */
-#define _axpTASKFUNC(A)                   \
-   void A(void) __attribute__ ((noreturn)); \
-   void A(void)
+#define _axpSTKNAME(A) A ## Stk
+#define _axpPIDNAME(A) A ## Pid
+#define  axpPIDNAME(A) _axpPIDNAME(A)
+#define _axpPCBNAME(A) A ## Pcb
 
-#define axpSTKNAME(A) A ## Stk
-#define axpPIDNAME(A) A ## Pid
+/* Define a thread */
+#define axpTHREADDEF(NAME, STK)                    \
+   axpPCB  _axpPCBNAME(NAME);                      \
+   axpPID  _axpPIDNAME(NAME) = &_axpPCBNAME(NAME); \
+   uint8_t _axpSTKNAME(NAME)[STK+_axpMINSTK];
 
-/* Define a task */
-#define axpTASKDEF(TASKNAME, STACKSZ)                  \
-   uint8_t axpSTKNAME(TASKNAME)[STACKSZ+_axpMINSTK]; \
-   axpPID axpPIDNAME(TASKNAME);                       \
-   _axpTASKFUNC(TASKNAME)
+#define axpINITTHREAD(TNAME,ENTRY,ARG) \
+   _axpPIDNAME(TNAME), \
+   ENTRY, \
+   &_axpSTKNAME(TNAME)[sizeof(_axpSTKNAME(TNAME))-1], \
+   ARG
+
 
 /* Interrupt handler */
 #define axpSIGINT(vector) \
@@ -50,8 +54,15 @@ typedef struct axpPCB
    _axpTASKFUNC(TASKNAME);       \
    extern axpPIDNAME(TASKNAME);
 
-extern axpPID axpInitThread(axpPID, void (*)(void *), uint8_t *, void *);
 
+extern axpPID  axpInitThread(axpPID,
+                             void (*)(void *),
+                             uint8_t *,
+                             void *);
+extern void    axpStartThread(axpPID,
+                             void (*)(void *),
+                             uint8_t *,
+                             void *);
 extern axpPID  axpSelf(void);
 extern uint8_t axpGetPriority(axpPID);
 extern void    axpSetPriority(axpPID, uint8_t);
@@ -59,7 +70,7 @@ extern void    axpResume(axpPID);
 extern void    axpSuspend(axpPID);
 extern void    axpYield(void);
 extern void    axpTerminate(axpPID);
-extern void    axpThreadExit(void);
+extern void    axpExitThread(void);
 extern void    axpHalt(void);
 
 /*****************************************************************************

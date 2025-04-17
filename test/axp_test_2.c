@@ -21,13 +21,8 @@
 
 #define NULL ((void *)0)
 
-axpPCB taskHaltPCB;
-axpPID taskHaltPID;
-uint8_t taskHaltStack[STK+_axpMINSTK];
-
-axpPCB taskTermPCB;
-axpPID taskTermPID;
-uint8_t taskTermStack[STK+_axpMINSTK];
+axpTHREADDEF(taskHalt, STK)
+axpTHREADDEF(taskTerm, STK)
 
 void taskHalt(void *pArg)
 {
@@ -49,7 +44,7 @@ void taskTerm(void *pArg)
       axpYield();
    }
    debug_putchar('X');
-   axpThreadExit();
+   axpExitThread();
    while(1);
 }
 
@@ -57,17 +52,8 @@ int main(void)
 {
    axpSetKernelStack(0);
 
-   taskHaltPID = axpInitThread(&taskHaltPCB,
-      taskHalt,
-      &taskHaltStack[sizeof(taskHaltStack)-1],
-      NULL);
-   axpResume(taskHaltPID);
-
-   taskTermPID = axpInitThread(&taskTermPCB,
-      taskTerm,
-      &taskTermStack[sizeof(taskTermStack)-1],
-      NULL);
-   axpResume(taskTermPID);
+   axpStartThread(axpINITTHREAD(taskHalt, taskHalt, NULL));
+   axpStartThread(axpINITTHREAD(taskTerm, taskTerm, NULL));
 
    axpStartKernel();
    while(1);

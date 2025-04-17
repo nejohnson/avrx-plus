@@ -19,13 +19,8 @@
 
 #define NULL ((void *)0)
 
-axpPCB taskMPCB;
-axpPID taskMPID;
-uint8_t taskMStack[STK+_axpMINSTK];
-
-axpPCB taskSPCB;
-axpPID taskSPID;
-uint8_t taskSStack[STK+_axpMINSTK];
+axpTHREADDEF(taskM, STK)
+axpTHREADDEF(taskS, STK)
 
 #define COUNT   10
 void taskM(void *pArg)
@@ -41,12 +36,12 @@ void taskM(void *pArg)
          n = COUNT;
 	 if(running) {
 	    debug_putchar('s');
-            axpSuspend(taskSPID);
+            axpSuspend(axpPIDNAME(taskS));
 	 }
          else
 	 {
 	    debug_putchar('r');
-            axpResume(taskSPID);
+            axpResume(axpPIDNAME(taskS));
 	 }
          running = !running;
       }
@@ -67,17 +62,8 @@ int main(void)
 {
    axpSetKernelStack(0);
 
-   taskMPID = axpInitThread(&taskMPCB,
-      taskM,
-      &taskMStack[sizeof(taskMStack)-1],
-      NULL);
-   axpResume(taskMPID);
-
-   taskSPID = axpInitThread(&taskSPCB,
-      taskS,
-      &taskSStack[sizeof(taskSStack)-1],
-      NULL);
-   axpResume(taskSPID);
+   axpStartThread(axpINITTHREAD(taskM, taskM, NULL));
+   axpStartThread(axpINITTHREAD(taskS, taskS, NULL));
 
    axpStartKernel();
    while(1);

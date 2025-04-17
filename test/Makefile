@@ -8,7 +8,7 @@ CC = avr-gcc
 
 LIBS = ../avrx-plus.a
 
-CFLAGS = -g -mmcu=atmega8 -fomit-frame-pointer -I../inc
+CFLAGS = -g -Wall -mmcu=atmega8 -fomit-frame-pointer -I../inc
 
 SIMPATH = ../../simulavr-mingw/app
 SIMULAVR = $(SIMPATH)/simulavr

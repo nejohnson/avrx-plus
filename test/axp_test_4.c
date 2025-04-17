@@ -17,13 +17,8 @@
 
 #define NULL ((void *)0)
 
-axpPCB task1PCB;
-axpPID task1PID;
-uint8_t task1Stack[STK+_axpMINSTK];
-
-axpPCB task2PCB;
-axpPID task2PID;
-uint8_t task2Stack[STK+_axpMINSTK];
+axpTHREADDEF(task1, STK)
+axpTHREADDEF(task2, STK)
 
 axpSEM sem = axpSEM_DONE;
 
@@ -61,17 +56,8 @@ int main(void)
 {
    axpSetKernelStack(0);
 
-   task1PID = axpInitThread(&task1PCB,
-      task1,
-      &task1Stack[sizeof(task1Stack)-1],
-      NULL);
-   axpResume(task1PID);
-
-   task2PID = axpInitThread(&task2PCB,
-      task2,
-      &task2Stack[sizeof(task2Stack)-1],
-      NULL);
-   axpResume(task2PID);
+   axpStartThread(axpINITTHREAD(task1, task1, NULL));
+   axpStartThread(axpINITTHREAD(task2, task2, NULL));
 
    axpResetSem(&sem);
    axpStartKernel();

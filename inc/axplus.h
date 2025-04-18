@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <avr/pgmspace.h>
+#include <avr/interrupt.h>
 
 /* Kernel *************************************************************/
 
@@ -43,7 +44,6 @@ typedef struct axpPCB
    ENTRY, \
    &_axpSTKNAME(TNAME)[sizeof(_axpSTKNAME(TNAME))-1], \
    ARG
-
 
 /* Interrupt handler */
 #define axpSIGINT(vector) \
